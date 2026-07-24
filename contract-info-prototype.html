@@ -1,0 +1,1449 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=1200" />
+  <title>合約 · CNF-1464 原型</title>
+  <style>
+    :root {
+      --primary: #58B6A8;
+      --primary-light: #E1F2F0;
+      --primary-hover: #4CA396;
+      --secondary: #5292D9;
+      --secondary-light: #E6F3FC;
+      --success: #66BB6A;
+      --success-light: #EDF7ED;
+      --brand-secondary: #5BAEA3;
+      --text-primary: #53545C;
+      --text-secondary: #8E8F98;
+      --text-disable: #D3D4DD;
+      --gray-1: #F3F3F4;
+      --gray-2: #D4D4D4;
+      --white: #FFFFFF;
+      --bg: #F5F8F9;
+      --warn: #663C00;
+      --warn-light: #FFF4E5;
+      --warn-main: #FFAB40;
+      --error-main: #FF8A80;
+      --danger: #E5484D;
+      --danger-light: #FDEAEA;
+      --radius: 4px;
+      --shadow-card: 0 6px 54px rgba(0, 0, 0, 0.05);
+      --shadow-hover: 0 4px 16px rgba(0, 0, 0, 0.06);
+      --font: "PingFang TC", "Noto Sans TC", "Microsoft JhengHei",
+              -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+
+    * { box-sizing: border-box; }
+    html, body { margin: 0; padding: 0; }
+    body {
+      font-family: var(--font);
+      font-size: 14px;
+      color: var(--text-primary);
+      background: var(--bg);
+      -webkit-font-smoothing: antialiased;
+      min-width: 1200px;
+    }
+    button { font-family: inherit; cursor: pointer; border: none; background: none; color: inherit; }
+    a { color: var(--primary); text-decoration: none; }
+
+    /* ============ App shell ============ */
+    .app { display: flex; min-height: 100vh; }
+    .sidebar {
+      width: 256px;
+      background: var(--white);
+      border-right: 1px solid var(--gray-1);
+      display: flex;
+      flex-direction: column;
+      position: sticky;
+      top: 0;
+      height: 100vh;
+      overflow-y: auto;
+    }
+    .main { flex: 1; display: flex; flex-direction: column; min-width: 0; }
+    .topbar {
+      height: 64px;
+      background: var(--white);
+      border-bottom: 1px solid var(--gray-1);
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      padding: 0 24px;
+      gap: 16px;
+      position: sticky;
+      top: 0;
+      z-index: 10;
+    }
+    .content { padding: 24px; }
+
+    /* ============ Page nav tabs (top-of-page primary nav) ============ */
+    .page-nav-tabs {
+      background: var(--white);
+      border-bottom: 1px solid var(--gray-1);
+      padding: 0 24px;
+      display: flex;
+      align-items: stretch;
+      justify-content: space-between;
+      height: 64px;
+    }
+    .page-tabs-list {
+      display: flex;
+      gap: 40px;
+      align-items: stretch;
+    }
+    .page-tab {
+      position: relative;
+      padding: 0 4px;
+      font-size: 18px;
+      color: var(--text-secondary);
+      cursor: pointer;
+      background: none;
+      border: none;
+      display: inline-flex;
+      align-items: center;
+      transition: color 0.15s;
+    }
+    .page-tab:hover { color: var(--text-primary); }
+    .page-tab.active { color: var(--primary); font-weight: 500; }
+    .page-tab.active::after {
+      content: "";
+      position: absolute;
+      left: 0; right: 0; bottom: 0;
+      height: 3px;
+      background: var(--primary);
+      border-radius: 2px 2px 0 0;
+    }
+    .page-tabs-meta {
+      display: inline-flex;
+      align-items: center;
+      font-size: 13px;
+      color: var(--text-secondary);
+    }
+
+    /* ============ Sidebar ============ */
+    .brand {
+      height: 64px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 0 24px;
+      border-bottom: 1px solid var(--gray-1);
+    }
+    .brand-logo {
+      width: 32px; height: 32px; border-radius: 8px;
+      background: var(--primary);
+      display: inline-flex; align-items: center; justify-content: center;
+      color: #fff; font-weight: 700; font-size: 14px;
+      letter-spacing: -0.5px;
+    }
+    .brand-name { font-size: 18px; font-weight: 600; color: var(--text-primary); }
+
+    .side-menu { list-style: none; padding: 12px 12px; margin: 0; flex: 1; }
+    .side-menu li { position: relative; }
+    .side-menu-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      height: 44px;
+      padding: 0 12px;
+      border-radius: var(--radius);
+      color: var(--text-primary);
+      font-size: 16px;
+      cursor: pointer;
+      user-select: none;
+      transition: background 0.12s;
+      width: 100%;
+      text-align: left;
+    }
+    .side-menu-item .icon { width: 20px; height: 20px; color: var(--text-secondary); flex-shrink: 0; }
+    .side-menu-item .label { flex: 1; }
+    .side-menu-item .chev { width: 14px; height: 14px; color: var(--text-secondary); transition: transform 0.15s; }
+    .side-menu-item.expanded .chev { transform: rotate(90deg); }
+    .side-menu-item:hover { background: var(--gray-1); }
+    .side-menu-item.active {
+      background: var(--primary-light);
+      color: var(--primary);
+      font-weight: 600;
+    }
+    .side-menu-item.active .icon { color: var(--primary); }
+    .side-menu-item.active::before {
+      content: "";
+      position: absolute;
+      left: -12px;
+      top: 8px; bottom: 8px;
+      width: 3px;
+      background: var(--primary);
+      border-radius: 0 3px 3px 0;
+    }
+    .side-submenu {
+      list-style: none;
+      padding: 0 0 4px 44px;
+      margin: 0;
+      overflow: hidden;
+      max-height: 0;
+      transition: max-height 0.2s ease;
+    }
+    .side-submenu.open { max-height: 400px; }
+    .side-submenu li a {
+      display: block;
+      padding: 8px 12px;
+      color: var(--text-secondary);
+      font-size: 14px;
+      border-radius: var(--radius);
+    }
+    .side-submenu li a:hover { background: var(--gray-1); color: var(--text-primary); }
+
+    /* ============ Topbar ============ */
+    .topbar .icon-btn {
+      width: 40px; height: 40px;
+      border-radius: 50%;
+      display: inline-flex; align-items: center; justify-content: center;
+      color: var(--text-secondary);
+    }
+    .topbar .icon-btn:hover { background: var(--gray-1); color: var(--text-primary); }
+    .topbar .user {
+      display: flex; align-items: center; gap: 8px;
+      padding: 6px 12px 6px 6px;
+      border-radius: 999px;
+    }
+    .topbar .user:hover { background: var(--gray-1); }
+    .avatar {
+      width: 32px; height: 32px; border-radius: 50%;
+      background: linear-gradient(135deg, #66BB6A, #58B6A8);
+      color: #fff; font-weight: 600;
+      display: inline-flex; align-items: center; justify-content: center;
+      font-size: 13px;
+    }
+    .user-email { font-size: 14px; color: var(--text-primary); }
+
+    /* ============ Cards / sections ============ */
+    .page-title-row {
+      display: flex; align-items: baseline; justify-content: space-between;
+      margin-bottom: 20px;
+    }
+    .page-title {
+      font-size: 24px; font-weight: 600; color: var(--text-primary);
+      margin: 0;
+    }
+    .page-crumb {
+      font-size: 13px; color: var(--text-secondary);
+    }
+    .page-crumb .sep { margin: 0 6px; color: var(--text-disable); }
+    .page-crumb .current { color: var(--text-primary); }
+
+    .card {
+      background: var(--white);
+      border-radius: 15px;
+      box-shadow: var(--shadow-card);
+      padding: 24px;
+      margin-bottom: 24px;
+    }
+    .section-title {
+      display: flex; align-items: center; gap: 8px;
+      font-size: 18px; font-weight: 600; color: var(--text-primary);
+      margin: 0 0 16px;
+    }
+    .section-title .tt-icon {
+      width: 16px; height: 16px; color: var(--text-secondary);
+      cursor: help;
+      position: relative;
+    }
+    .section-hint { color: var(--text-secondary); font-size: 14px; margin-left: 8px; font-weight: 400; }
+
+    /* ============ Overview card ============ */
+    .overview {
+      display: grid;
+      grid-template-columns: 1fr 1.6fr;
+      gap: 32px;
+    }
+    .overview-left { border-right: 1px solid var(--gray-1); padding-right: 32px; }
+    .overview-right {}
+
+    .field { margin-bottom: 16px; }
+    .field:last-child { margin-bottom: 0; }
+    .field-label {
+      font-size: 13px;
+      color: var(--text-secondary);
+      margin-bottom: 6px;
+      display: flex; align-items: center; gap: 4px;
+    }
+    .field-chain-tag {
+      display: inline-block;
+      font-size: 11px;
+      padding: 2px 6px;
+      background: var(--secondary-light);
+      color: var(--secondary);
+      border-radius: 3px;
+      font-weight: 500;
+      margin-left: 4px;
+    }
+    .field-value {
+      font-size: 16px; color: var(--text-primary); font-weight: 500;
+    }
+    .field-value-lg {
+      font-size: 18px; color: var(--text-primary); font-weight: 600;
+    }
+    .field-value.muted { color: var(--text-secondary); font-weight: 400; }
+
+    .select {
+      appearance: none;
+      -webkit-appearance: none;
+      width: 100%;
+      height: 40px;
+      padding: 0 36px 0 14px;
+      border: 1px solid var(--gray-2);
+      border-radius: var(--radius);
+      background: var(--white)
+        url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 16 16' fill='none'><path d='M4 6l4 4 4-4' stroke='%238E8F98' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/></svg>")
+        no-repeat right 12px center;
+      font-size: 14px;
+      font-family: inherit;
+      color: var(--text-primary);
+      transition: border-color 0.15s, box-shadow 0.15s;
+    }
+    .select:focus {
+      outline: none;
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(88, 182, 168, 0.15);
+    }
+
+    /* ============ Filter / search bar (floating-label style) ============ */
+    .filter-bar {
+      display: flex;
+      gap: 12px;
+      align-items: flex-start;
+    }
+    .floating-field {
+      position: relative;
+      flex: 1;
+      max-width: 424px;
+    }
+    .floating-field .fl-label {
+      position: absolute;
+      top: -8px;
+      left: 12px;
+      padding: 0 4px;
+      background: var(--white);
+      font-size: 12px;
+      color: var(--text-secondary);
+      z-index: 1;
+      line-height: 1;
+    }
+    .floating-field .select {
+      height: 56px;
+      padding: 0 40px 0 16px;
+      font-size: 16px;
+      border-color: var(--gray-2);
+      background-position: right 16px center;
+      line-height: 56px;
+    }
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      width: 77px;
+      height: 56px;
+      padding: 0;
+      font-size: 16px;
+      font-weight: 600;
+      letter-spacing: 0.5px;
+      border-radius: var(--radius);
+      background: var(--secondary);
+      color: var(--white);
+      transition: opacity 0.15s;
+    }
+    .btn:hover { opacity: 0.9; }
+    .btn:active { opacity: 0.85; }
+    .btn svg { width: 18px; height: 18px; }
+
+    /* ============ Summary card (合約狀態 4 欄總覽 + 公司資訊) ============ */
+    .summary-card {
+      padding: 24px;
+      margin-bottom: 24px;
+      border-radius: 15px;
+      display: flex;
+      flex-direction: column;
+      gap: 24px;
+    }
+    .summary-grid {
+      display: flex;
+      gap: 24px;
+      align-items: stretch;
+      padding-bottom: 24px;
+      border-bottom: 1px solid var(--gray-2);
+    }
+    .summary-item {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      align-items: flex-start;
+      padding-right: 24px;
+      border-right: 1px solid var(--gray-2);
+      flex: 1 0 0;
+      min-width: 0;
+    }
+    .summary-item:last-child { border-right: none; padding-right: 0; }
+    .summary-title {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .summary-icon {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      background: var(--primary-light);
+      padding: 4px;
+      border-radius: 8px;
+    }
+    .summary-icon svg { width: 16px; height: 16px; color: var(--primary); }
+    .summary-label {
+      font-size: 16px;
+      color: var(--text-primary);
+      line-height: 1.5;
+    }
+    .summary-value {
+      font-size: 24px;
+      font-weight: 600;
+      color: var(--text-primary);
+      line-height: 1.1;
+      font-variant-numeric: tabular-nums;
+      word-break: break-word;
+    }
+    .summary-value.mint { color: var(--primary); }
+    .summary-value.warn { color: var(--warn-main); }
+    .summary-value.error { color: var(--error-main); }
+    .summary-value.muted { color: var(--text-secondary); }
+    .summary-value.dash { color: var(--text-disable); font-weight: 400; }
+    .summary-item .chip { margin-top: 0; }
+
+    /* ============ Business info (inside summary card, below divider) ============ */
+    .business-info {
+      font-size: 16px;
+      color: var(--text-secondary);
+      line-height: 1.5;
+    }
+
+    /* ============ Sub-heading (買斷硬體 / 月租軟體 etc) ============ */
+    .sub-heading {
+      font-size: 18px;
+      font-weight: 600;
+      color: var(--text-primary);
+      line-height: 1.1;
+      margin: 0;
+    }
+    .table-section {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      width: 100%;
+    }
+
+    /* ============ Empty state (search 查無結果 / 尚無合約內容) ============ */
+    .empty-state {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      padding: 60px 0;
+      background: var(--bg);
+      border-radius: 10px;
+      width: 100%;
+    }
+    .empty-state[hidden] { display: none !important; }
+    .empty-state svg { width: 160px; height: 160px; }
+    .empty-state .empty-text {
+      font-size: 16px;
+      color: var(--text-secondary);
+      line-height: 1.5;
+    }
+
+    /* ============ Search input (in-tab) ============ */
+    .search-input {
+      position: relative;
+      width: 400px;
+      margin: 0;
+    }
+    .search-input .s-icon {
+      position: absolute;
+      left: 12px; top: 50%;
+      transform: translateY(-50%);
+      color: var(--text-secondary);
+      width: 24px; height: 24px;
+      pointer-events: none;
+    }
+    .search-input input {
+      width: 100%;
+      height: 40px;
+      padding: 0 12px 0 44px;
+      border: 1px solid var(--gray-2);
+      border-radius: var(--radius);
+      font-family: inherit;
+      font-size: 16px;
+      line-height: 1.5;
+      color: var(--text-primary);
+      background: var(--white);
+      transition: border-color 0.15s, box-shadow 0.15s;
+    }
+    .search-input input:focus {
+      outline: none;
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(88, 182, 168, 0.15);
+    }
+    .search-input input::placeholder { color: var(--text-secondary); }
+
+    /* ============ Pagination ============ */
+    .pagination {
+      display: flex;
+      justify-content: flex-end;
+      align-items: center;
+      gap: 24px;
+      padding: 16px 4px 4px;
+      font-size: 13px;
+      color: var(--text-secondary);
+    }
+    .pagination .page-size {
+      display: inline-flex; align-items: center; gap: 6px;
+    }
+    .pagination .page-size select {
+      appearance: none;
+      -webkit-appearance: none;
+      border: none;
+      background: transparent
+        url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 16 16' fill='none'><path d='M4 6l4 4 4-4' stroke='%238E8F98' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/></svg>")
+        no-repeat right center;
+      padding: 4px 20px 4px 4px;
+      color: var(--text-primary);
+      font-size: 13px;
+      cursor: pointer;
+      font-family: inherit;
+    }
+    .pagination .page-nav {
+      display: inline-flex; gap: 4px;
+    }
+    .pagination .page-nav button {
+      width: 28px; height: 28px;
+      border-radius: 4px;
+      color: var(--text-secondary);
+      display: inline-flex; align-items: center; justify-content: center;
+    }
+    .pagination .page-nav button:hover { background: var(--gray-1); color: var(--text-primary); }
+
+    .status-header {
+      display: flex; align-items: center; justify-content: space-between;
+      margin-bottom: 16px;
+    }
+    .status-header-title { font-size: 13px; color: var(--text-secondary); }
+
+    .metrics {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+    }
+    .metric {
+      background: var(--gray-1);
+      border-radius: var(--radius);
+      padding: 16px;
+    }
+    .metric-label {
+      font-size: 13px;
+      color: var(--text-secondary);
+      margin-bottom: 8px;
+    }
+    .metric-value {
+      font-size: 20px;
+      font-weight: 600;
+      color: var(--text-primary);
+      line-height: 1.2;
+      margin-bottom: 8px;
+    }
+    .metric-value.muted { color: var(--text-secondary); font-size: 15px; font-weight: 500; }
+
+    /* ============ Chips ============ */
+    .chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 3px 10px;
+      border-radius: 999px;
+      font-size: 12px;
+      font-weight: 600;
+      line-height: 1.4;
+      letter-spacing: 0.2px;
+      white-space: nowrap;
+    }
+    .chip-lg {
+      padding: 5px 14px;
+      font-size: 13px;
+    }
+    .chip-active { background: var(--success-light); color: var(--success); }
+    .chip-warn { background: var(--warn-light); color: var(--warn); cursor: help; }
+    .chip-expired { background: var(--danger-light); color: var(--danger); }
+    .chip-neutral { background: var(--gray-1); color: var(--text-secondary); }
+    .chip-info { background: var(--secondary-light); color: var(--secondary); }
+    .chip-dot::before {
+      content: "";
+      width: 6px; height: 6px;
+      border-radius: 50%;
+      background: currentColor;
+      display: inline-block;
+    }
+
+    /* ============ Tables ============ */
+    .table-group {
+      border: 1px solid var(--gray-1);
+      border-radius: 10px;
+      overflow: hidden;
+      margin-bottom: 16px;
+    }
+    .table-group:last-child { margin-bottom: 0; }
+    .table-scroll {
+      overflow-x: auto;
+      border: 1px solid var(--gray-1);
+      border-radius: 10px;
+      margin: 0;
+      width: 100%;
+    }
+    .data-table {
+      width: 100%;
+      border-collapse: collapse;
+      background: var(--white);
+      font-size: 14px;
+      table-layout: fixed;
+    }
+    .data-table thead tr { background: var(--gray-1); }
+    .data-table th {
+      text-align: left;
+      font-weight: 600;
+      color: var(--text-primary);
+      padding: 8px 16px;
+      font-size: 14px;
+      line-height: 1.5;
+      white-space: nowrap;
+    }
+    .data-table tbody tr { border-bottom: 1px solid var(--gray-1); }
+    .data-table tbody tr:last-child { border-bottom: none; }
+    .data-table td {
+      padding: 8px 16px;
+      color: var(--text-primary);
+      vertical-align: middle;
+      font-size: 14px;
+      line-height: 1.5;
+      white-space: nowrap;
+    }
+    .data-table td.wrap { white-space: normal; min-width: 180px; }
+    /* Long item-name columns (software / past contracts): allow wrapping */
+    .data-table.name-first tbody td:first-child { white-space: normal; min-width: 200px; max-width: 320px; }
+    .data-table tbody tr:last-child td { border-bottom: none; }
+    .data-table tbody tr:hover { background: var(--bg); }
+    .data-table td .cell-strong { font-weight: 400; }
+    .data-table td .cell-muted { color: var(--text-secondary); font-size: 13px; }
+    .data-table td .cell-mono { font-family: "SF Mono", "Menlo", ui-monospace, monospace; font-size: 13px; }
+    .data-table .num { font-variant-numeric: tabular-nums; }
+
+    .cell-with-chip {
+      display: inline-flex; align-items: center; gap: 8px;
+    }
+
+    .invoice-link {
+      color: var(--text-primary);
+      font-family: inherit;
+      font-size: 14px;
+    }
+
+    /* ============ Tabs ============ */
+    .contract-tabs {
+      filter: drop-shadow(0 6px 27px rgba(0, 0, 0, 0.05));
+      margin-bottom: 16px;
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+    }
+    .tabs-bar {
+      display: flex;
+      align-items: center;
+    }
+    .tab-btn {
+      position: relative;
+      padding: 12px 24px;
+      font-size: 18px;
+      font-weight: 400;
+      color: var(--text-secondary);
+      cursor: pointer;
+      background: transparent;
+      border: none;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      line-height: 1.1;
+      border-radius: 10px 10px 0 0;
+      transition: color 0.15s, background 0.15s;
+    }
+    .tab-btn:hover { color: var(--text-primary); }
+    .tab-btn.active {
+      color: var(--text-primary);
+      font-weight: 600;
+      background: var(--white);
+    }
+    .tab-panels {
+      background: var(--white);
+      border-radius: 15px;
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      gap: 24px;
+      padding: 24px;
+    }
+    /* When first/last tab is active, remove that side's panel top corner so the tab flows seamlessly */
+    .contract-tabs:has(.tab-btn:nth-of-type(1).active) .tab-panels {
+      border-top-left-radius: 0;
+    }
+    .contract-tabs:has(.tab-btn:last-of-type.active) .tab-panels {
+      border-top-right-radius: 0;
+    }
+    .tab-panel { display: none; padding: 0; }
+    .tab-panel.active { display: flex; flex-direction: column; gap: 24px; }
+    .panel-hint {
+      font-size: 14px;
+      color: var(--text-primary);
+      margin: 0;
+      line-height: 1.5;
+    }
+
+    /* ============ Collapsible past contracts ============ */
+    .collapsible .collapsible-head {
+      display: flex; align-items: center; justify-content: space-between;
+      cursor: pointer;
+      user-select: none;
+      padding: 0;
+      background: transparent;
+      width: 100%;
+    }
+    .collapsible .collapsible-head:hover .section-title { color: var(--primary); }
+    .collapsible-head-left { display: flex; align-items: center; gap: 10px; }
+    .chev-toggle {
+      width: 24px; height: 24px;
+      display: inline-flex; align-items: center; justify-content: center;
+      color: var(--text-secondary);
+      transition: transform 0.18s;
+    }
+    .collapsible.open .chev-toggle { transform: rotate(90deg); }
+    .collapsible-body {
+      overflow: hidden;
+      max-height: 0;
+      transition: max-height 0.3s ease, margin-top 0.3s ease;
+    }
+    .collapsible.open .collapsible-body {
+      max-height: 2000px;
+      margin-top: 16px;
+    }
+
+    /* ============ Tooltip ============ */
+    [data-tooltip] {
+      position: relative;
+    }
+    [data-tooltip]::after {
+      content: attr(data-tooltip);
+      position: absolute;
+      bottom: calc(100% + 8px);
+      left: 50%;
+      transform: translateX(-50%);
+      background: rgba(17, 24, 39, 0.92);
+      color: #fff;
+      padding: 6px 10px;
+      font-size: 12px;
+      font-weight: 400;
+      border-radius: var(--radius);
+      white-space: nowrap;
+      pointer-events: none;
+      opacity: 0;
+      transition: opacity 0.15s;
+      z-index: 20;
+    }
+    [data-tooltip]::before {
+      content: "";
+      position: absolute;
+      bottom: calc(100% + 3px);
+      left: 50%;
+      transform: translateX(-50%);
+      border: 4px solid transparent;
+      border-top-color: rgba(17, 24, 39, 0.92);
+      pointer-events: none;
+      opacity: 0;
+      transition: opacity 0.15s;
+      z-index: 20;
+    }
+    [data-tooltip]:hover::after,
+    [data-tooltip]:hover::before {
+      opacity: 1;
+    }
+
+    /* ============ Toast ============ */
+    .toast {
+      position: fixed;
+      bottom: 32px;
+      left: 50%;
+      transform: translateX(-50%) translateY(20px);
+      background: rgba(17, 24, 39, 0.92);
+      color: #fff;
+      padding: 10px 20px;
+      border-radius: 999px;
+      font-size: 14px;
+      opacity: 0;
+      transition: opacity 0.2s, transform 0.2s;
+      pointer-events: none;
+      z-index: 100;
+    }
+    .toast.show {
+      opacity: 1;
+      transform: translateX(-50%) translateY(0);
+    }
+
+    /* ============ Footer ============ */
+    .footer {
+      padding: 16px 24px;
+      color: var(--text-secondary);
+      font-size: 12px;
+      display: flex;
+      gap: 16px;
+      border-top: 1px solid var(--gray-1);
+      background: var(--white);
+      margin-top: 24px;
+    }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <!-- ============ Sidebar ============ -->
+    <aside class="sidebar">
+      <div class="brand">
+        <span class="brand-logo">小二</span>
+        <span class="brand-name">小二</span>
+      </div>
+      <ul class="side-menu">
+        <li>
+          <button class="side-menu-item">
+            <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>
+            <span class="label">營運總覽</span>
+          </button>
+        </li>
+        <li>
+          <button class="side-menu-item">
+            <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="3" width="16" height="18" rx="2"/><line x1="8" y1="7" x2="16" y2="7"/><line x1="8" y1="11" x2="16" y2="11"/><line x1="8" y1="15" x2="12" y2="15"/></svg>
+            <span class="label">裝置列表</span>
+          </button>
+        </li>
+        <li>
+          <button class="side-menu-item" data-toggle>
+            <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 17 9 11 13 15 21 7"/><polyline points="14 7 21 7 21 14"/></svg>
+            <span class="label">統計報表</span>
+            <svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 6 15 12 9 18"/></svg>
+          </button>
+        </li>
+        <li>
+          <button class="side-menu-item" data-toggle>
+            <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16v16H4z"/><line x1="4" y1="9" x2="20" y2="9"/><line x1="9" y1="4" x2="9" y2="20"/></svg>
+            <span class="label">菜單管理</span>
+            <svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 6 15 12 9 18"/></svg>
+          </button>
+        </li>
+        <li>
+          <button class="side-menu-item" data-toggle>
+            <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 3v4a1 1 0 001 1h4"/><path d="M17 21H7a2 2 0 01-2-2V5a2 2 0 012-2h7l5 5v11a2 2 0 01-2 2z"/><line x1="9" y1="13" x2="15" y2="13"/><line x1="9" y1="17" x2="13" y2="17"/></svg>
+            <span class="label">發票管理</span>
+            <svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 6 15 12 9 18"/></svg>
+          </button>
+        </li>
+        <li>
+          <button class="side-menu-item" data-toggle>
+            <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 12V8a2 2 0 00-2-2H6a2 2 0 00-2 2v4"/><path d="M4 12v4a2 2 0 002 2h12a2 2 0 002-2v-4"/><circle cx="12" cy="12" r="2"/></svg>
+            <span class="label">優惠促銷</span>
+            <svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 6 15 12 9 18"/></svg>
+          </button>
+        </li>
+        <li>
+          <button class="side-menu-item" data-toggle>
+            <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-6 9 6v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+            <span class="label">商店管理</span>
+            <svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 6 15 12 9 18"/></svg>
+          </button>
+        </li>
+        <li>
+          <button class="side-menu-item" data-toggle>
+            <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 7H4M4 7l2-4h12l2 4M4 7v13h16V7"/><rect x="9" y="11" width="6" height="5"/></svg>
+            <span class="label">庫存管理</span>
+            <svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 6 15 12 9 18"/></svg>
+          </button>
+        </li>
+        <li>
+          <button class="side-menu-item" data-toggle>
+            <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="20" r="1.5"/><circle cx="18" cy="20" r="1.5"/><path d="M2 3h3l2.5 12h11L21 7H6"/></svg>
+            <span class="label">叫貨管理</span>
+            <svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 6 15 12 9 18"/></svg>
+          </button>
+        </li>
+        <li>
+          <button class="side-menu-item" data-toggle>
+            <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4.4 3.6-8 8-8s8 3.6 8 8"/></svg>
+            <span class="label">會員管理</span>
+            <svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 6 15 12 9 18"/></svg>
+          </button>
+        </li>
+        <li>
+          <button class="side-menu-item" data-toggle>
+            <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="10" width="16" height="10" rx="2"/><path d="M8 10V7a4 4 0 018 0v3"/></svg>
+            <span class="label">權限管理</span>
+            <svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 6 15 12 9 18"/></svg>
+          </button>
+        </li>
+        <li>
+          <button class="side-menu-item" data-toggle>
+            <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="6" width="18" height="12" rx="2"/><line x1="3" y1="10" x2="21" y2="10"/><line x1="7" y1="14" x2="9" y2="14"/></svg>
+            <span class="label">裝置管理</span>
+            <svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 6 15 12 9 18"/></svg>
+          </button>
+        </li>
+        <li>
+          <button class="side-menu-item active">
+            <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 3H7a2 2 0 00-2 2v14a2 2 0 002 2h10a2 2 0 002-2V8z"/><polyline points="14 3 14 8 19 8"/><line x1="9" y1="13" x2="15" y2="13"/><line x1="9" y1="17" x2="15" y2="17"/></svg>
+            <span class="label">合約管理</span>
+          </button>
+        </li>
+      </ul>
+    </aside>
+
+    <!-- ============ Main ============ -->
+    <div class="main">
+      <header class="topbar">
+        <button class="icon-btn" aria-label="說明" data-tooltip="說明">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 015.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+        </button>
+        <button class="icon-btn" aria-label="語系">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 010 20M12 2a15.3 15.3 0 000 20"/></svg>
+        </button>
+        <button class="icon-btn" aria-label="通知">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8a6 6 0 10-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 01-3.46 0"/></svg>
+        </button>
+        <button class="user">
+          <span class="avatar">D</span>
+          <span class="user-email">demo@cashier.tw</span>
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color: var(--text-secondary);"><polyline points="6 9 12 15 18 9"/></svg>
+        </button>
+      </header>
+
+      <!-- Page nav tabs (single tab since there's only one view) -->
+      <nav class="page-nav-tabs" role="tablist" aria-label="頁面導覽">
+        <div class="page-tabs-list">
+          <button class="page-tab active" role="tab" aria-selected="true">合約管理</button>
+        </div>
+      </nav>
+
+      <div class="content">
+        <!-- ========= Filter / search bar ========= -->
+        <section class="card">
+          <div class="filter-bar">
+            <div class="floating-field">
+              <label class="fl-label" for="storeSelector">商店</label>
+              <select class="select" id="storeSelector">
+                <option value="east">電小二 東科店</option>
+                <option value="south">電小二 南港店</option>
+                <option value="west">電小二 西門店</option>
+                <option value="north">電小二 北車店</option>
+                <option value="neihu">電小二 內湖店</option>
+              </select>
+            </div>
+            <button class="btn" type="button">查詢</button>
+          </div>
+        </section>
+
+        <!-- ========= Summary card (合約狀態 4 欄 + 公司資訊) ========= -->
+        <section class="card summary-card">
+          <div class="summary-grid">
+            <div class="summary-item" data-key="status">
+              <div class="summary-title">
+                <span class="summary-icon">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 3H7a2 2 0 00-2 2v14a2 2 0 002 2h10a2 2 0 002-2V8z"/><polyline points="14 3 14 8 19 8"/><line x1="9" y1="13" x2="15" y2="13"/><line x1="9" y1="17" x2="15" y2="17"/></svg>
+                </span>
+                <span class="summary-label">合約狀態</span>
+              </div>
+              <div class="summary-value" data-value></div>
+            </div>
+            <div class="summary-item" data-key="duration">
+              <div class="summary-title">
+                <span class="summary-icon">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+                </span>
+                <span class="summary-label">合約起訖日</span>
+              </div>
+              <div class="summary-value" data-value></div>
+            </div>
+            <div class="summary-item" data-key="hardware">
+              <div class="summary-title">
+                <span class="summary-icon">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="12" rx="2"/><line x1="7" y1="20" x2="17" y2="20"/><line x1="12" y1="16" x2="12" y2="20"/></svg>
+                </span>
+                <span class="summary-label">硬體到期日</span>
+              </div>
+              <div class="summary-value" data-value></div>
+              <span class="chip chip-warn" data-tooltip="到期前 30 天內" data-chip hidden>即將到期</span>
+            </div>
+            <div class="summary-item" data-key="software">
+              <div class="summary-title">
+                <span class="summary-icon">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 10h-1.26A8 8 0 109 20h9a5 5 0 000-10z"/></svg>
+                </span>
+                <span class="summary-label">軟體到期日</span>
+              </div>
+              <div class="summary-value" data-value></div>
+              <span class="chip chip-warn" data-tooltip="到期前 30 天內" data-chip hidden>即將到期</span>
+            </div>
+          </div>
+          <div class="business-info">
+            公司名稱：鴻智互動股份有限公司・統一編號：83483170
+          </div>
+        </section>
+
+        <!-- ========= Contract detail tabs ========= -->
+        <div class="contract-tabs" id="contractTabs">
+          <div class="tabs-bar" role="tablist">
+            <button class="tab-btn active" data-panel="hw" role="tab">硬體合約</button>
+            <button class="tab-btn" data-panel="sw" role="tab">軟體合約</button>
+            <button class="tab-btn" data-panel="past" role="tab">過往合約</button>
+          </div>
+
+          <div class="tab-panels">
+          <!-- Panel: Hardware -->
+          <div class="tab-panel active" data-panel="hw" role="tabpanel">
+            <p class="panel-hint">當前硬體合約，僅包含 Kiosk、POS 機台。</p>
+            <div class="search-input">
+              <svg class="s-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+              <input type="text" placeholder="搜尋" />
+            </div>
+
+            <div class="table-section">
+            <h3 class="sub-heading">買斷硬體</h3>
+            <div class="table-scroll"><table class="data-table">
+              <thead>
+                <tr>
+                  <th>產品類別</th>
+                  <th>機型</th>
+                  <th>序號</th>
+                  <th class="num">費用</th>
+                  <th>購買日</th>
+                  <th>保固到期日</th>
+                  <th>硬體狀態</th>
+                  <th>發票號碼</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><span class="cell-strong">Kiosk</span></td>
+                  <td>MF</td>
+                  <td><span class="cell-mono">K2024-0812-A</span></td>
+                  <td class="num">$68,000</td>
+                  <td>2024-08-12</td>
+                  <td>2026-08-11</td>
+                  <td>使用中</td>
+                  <td><a class="invoice-link">AB12345678</a></td>
+                </tr>
+                <tr>
+                  <td><span class="cell-strong">POS</span></td>
+                  <td>Advantech</td>
+                  <td><span class="cell-mono">P2024-1105-B</span></td>
+                  <td class="num">$42,000</td>
+                  <td>2024-11-05</td>
+                  <td>2026-11-04</td>
+                  <td>已歸還</td>
+                  <td><a class="invoice-link">AB99887766</a></td>
+                </tr>
+              </tbody>
+            </table></div>
+            </div><!-- /table-section 買斷 -->
+
+            <div class="table-section">
+            <h3 class="sub-heading">租賃硬體</h3>
+            <div class="table-scroll"><table class="data-table">
+              <thead>
+                <tr>
+                  <th>產品類別</th>
+                  <th>機型</th>
+                  <th>序號</th>
+                  <th class="num">費用</th>
+                  <th>租期</th>
+                  <th class="num">期數</th>
+                  <th>硬體狀態</th>
+                  <th>發票號碼</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><span class="cell-strong">Kiosk</span></td>
+                  <td>MP</td>
+                  <td><span class="cell-mono">K2025-0101-C</span></td>
+                  <td class="num">$4,200/月</td>
+                  <td>2025-01-01 ～<br>2025-12-31</td>
+                  <td class="num">12 期</td>
+                  <td>使用中</td>
+                  <td><a class="invoice-link">CD11223344</a></td>
+                </tr>
+                <tr>
+                  <td><span class="cell-strong">Kiosk</span></td>
+                  <td>MD</td>
+                  <td><span class="cell-mono">K2025-0301-D</span></td>
+                  <td class="num">$3,500/月</td>
+                  <td>2025-03-01 ～<br>2026-02-28</td>
+                  <td class="num">12 期</td>
+                  <td>使用中</td>
+                  <td><a class="invoice-link">CD22334455</a></td>
+                </tr>
+                <tr>
+                  <td><span class="cell-strong">POS</span></td>
+                  <td>iMin</td>
+                  <td><span class="cell-mono">P2025-0501-E</span></td>
+                  <td class="num">$2,800/月</td>
+                  <td>2025-05-01 ～<br>2026-04-30</td>
+                  <td class="num">12 期</td>
+                  <td>使用中</td>
+                  <td><a class="invoice-link">CD33445566</a></td>
+                </tr>
+              </tbody>
+            </table></div>
+            </div><!-- /table-section 租賃 -->
+
+            <div class="empty-state" data-empty hidden>
+              <svg viewBox="0 0 160 160" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="M7 25.0566C7 20.0548 11.0548 16 16.0566 16H117.943C122.945 16 127 20.0548 127 25.0566V126.943C127 131.945 122.945 136 117.943 136H16.0566C11.0548 136 7 131.945 7 126.943V25.0566Z" fill="white"/><path d="M7 25.0566C7 20.0548 11.0548 16 16.0566 16H117.943C122.945 16 127 20.0548 127 25.0566V40H7V25.0566Z" fill="#BCE2DC"/><path d="M23.8242 28.0001C23.8242 30.2092 22.0334 32.0001 19.8242 32.0001C17.6151 32.0001 15.8242 30.2092 15.8242 28.0001C15.8242 25.7909 17.6151 24.0001 19.8242 24.0001C22.0334 24.0001 23.8242 25.7909 23.8242 28.0001Z" fill="white"/><path d="M35 28C35 30.2091 33.2091 32 31 32C28.7909 32 27 30.2091 27 28C27 25.7909 28.7909 24 31 24C33.2091 24 35 25.7909 35 28Z" fill="white"/><path d="M47 28C47 30.2091 45.2091 32 43 32C40.7909 32 39 30.2091 39 28C39 25.7909 40.7909 24 43 24C45.2091 24 47 25.7909 47 28Z" fill="white"/><circle cx="116.5" cy="108.5" r="27.5" fill="white"/><path d="M137.57 125.431C136.398 124.259 134.499 124.259 133.327 125.431C132.156 126.602 132.156 128.502 133.327 129.673L135.448 127.552L137.57 125.431ZM150.535 146.881C151.706 148.052 153.606 148.052 154.777 146.881C155.949 145.709 155.949 143.81 154.777 142.638L152.656 144.759L150.535 146.881ZM127.839 99.6309C129.01 98.4593 129.01 96.5598 127.839 95.3883C126.667 94.2167 124.768 94.2167 123.596 95.3883L125.717 97.5096L127.839 99.6309ZM103.596 115.388C102.424 116.56 102.424 118.459 103.596 119.631C104.768 120.802 106.667 120.802 107.839 119.631L105.717 117.51L103.596 115.388ZM107.839 95.3883C106.667 94.2167 104.768 94.2167 103.596 95.3883C102.424 96.5598 102.424 98.4593 103.596 99.6309L105.717 97.5096L107.839 95.3883ZM123.596 119.631C124.768 120.802 126.667 120.802 127.839 119.631C129.01 118.459 129.01 116.56 127.839 115.388L125.717 117.51L123.596 119.631ZM135.448 127.552L133.327 129.673L150.535 146.881L152.656 144.759L154.777 142.638L137.57 125.431L135.448 127.552ZM115.51 135.208V138.208C132.078 138.208 145.51 124.776 145.51 108.208H142.51H139.51C139.51 121.462 128.765 132.208 115.51 132.208V135.208ZM142.51 108.208H145.51C145.51 91.6391 132.078 78.2076 115.51 78.2076V81.2076V84.2076C128.765 84.2076 139.51 94.9528 139.51 108.208H142.51ZM115.51 81.2076V78.2076C98.9412 78.2076 85.5098 91.6391 85.5098 108.208H88.5098H91.5098C91.5098 94.9528 102.255 84.2076 115.51 84.2076V81.2076ZM88.5098 108.208H85.5098C85.5098 124.776 98.9412 138.208 115.51 138.208V135.208V132.208C102.255 132.208 91.5098 121.462 91.5098 108.208H88.5098ZM125.717 97.5096L123.596 95.3883L113.596 105.388L115.717 107.51L117.839 109.631L127.839 99.6309L125.717 97.5096ZM115.717 107.51L113.596 105.388L103.596 115.388L105.717 117.51L107.839 119.631L117.839 109.631L115.717 107.51ZM105.717 97.5096L103.596 99.6309L113.596 109.631L115.717 107.51L117.839 105.388L107.839 95.3883L105.717 97.5096ZM115.717 107.51L113.596 109.631L123.596 119.631L125.717 117.51L127.839 115.388L117.839 105.388L115.717 107.51Z" fill="#BCE2DC"/></svg>
+              <div class="empty-text">查無結果</div>
+            </div>
+            <div class="empty-state" data-empty-nocontract hidden>
+              <svg viewBox="0 0 160 160" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="M34.9559 53.6984C35.566 50.9532 38.0008 49 40.813 49H121.187C123.999 49 126.434 50.9532 127.044 53.6984L134.952 89.2862C135.564 92.0384 134.177 94.8452 131.619 96.0311L83.5238 118.33C81.9231 119.072 80.0769 119.072 78.4762 118.33L30.3809 96.0311C27.823 94.8452 26.4359 92.0384 27.0475 89.2862L34.9559 53.6984Z" fill="white"/><path d="M136 127C136 130.314 133.314 133 130 133H32C28.6863 133 26 130.314 26 127V95C26 91.6863 28.6863 89 32 89H60C63.3137 89 65.8841 91.8061 67.263 94.8193C69.472 99.6464 74.3444 103 80 103C85.6556 103 90.528 99.6464 92.737 94.8193C94.1159 91.8061 96.6863 89 100 89H130C133.314 89 136 91.6863 136 95V127Z" fill="#BCE2DC"/><path d="M80 17L80 33" stroke="#BCE2DC" stroke-width="4" stroke-linecap="round"/><path d="M55 21L60 33" stroke="#BCE2DC" stroke-width="4" stroke-linecap="round"/><path d="M105 21L100 33" stroke="#BCE2DC" stroke-width="4" stroke-linecap="round"/></svg>
+              <div class="empty-text">尚無合約內容</div>
+            </div>
+          </div><!-- /panel:hw -->
+
+          <!-- Panel: Software -->
+          <div class="tab-panel" data-panel="sw" role="tabpanel">
+            <p class="panel-hint">當前軟體合約，僅收訂閱費。</p>
+            <div class="search-input">
+              <svg class="s-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+              <input type="text" placeholder="搜尋" />
+            </div>
+
+            <div class="table-section">
+            <h3 class="sub-heading">月租軟體</h3>
+            <div class="table-scroll"><table class="data-table name-first">
+              <thead>
+                <tr>
+                  <th>項目名稱</th>
+                  <th class="num">費用</th>
+                  <th>生效日</th>
+                  <th>到期日</th>
+                  <th>發票號碼</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><span class="cell-strong">Kiosk 點餐系統訂閱費</span></td>
+                  <td class="num">$12,000/年</td>
+                  <td>2025-05-01</td>
+                  <td>2026-04-30</td>
+                  <td><a class="invoice-link">AB12345678</a></td>
+                </tr>
+                <tr>
+                  <td><span class="cell-strong">KDS 廚房顯示系統訂閱費</span></td>
+                  <td class="num">$6,000/年</td>
+                  <td>2025-05-01</td>
+                  <td>2026-04-30</td>
+                  <td><a class="invoice-link">AB3234922</a></td>
+                </tr>
+                <tr>
+                  <td><span class="cell-strong">電子發票加值平台訂閱費</span></td>
+                  <td class="num">$3,600/年</td>
+                  <td>2025-05-01</td>
+                  <td>2026-04-30</td>
+                  <td><a class="invoice-link">AB12354294</a></td>
+                </tr>
+              </tbody>
+            </table></div>
+            </div><!-- /table-section 月租 -->
+
+            <div class="table-section">
+            <h3 class="sub-heading">年租軟體</h3>
+            <div class="table-scroll"><table class="data-table name-first">
+              <thead>
+                <tr>
+                  <th>項目名稱</th>
+                  <th class="num">費用</th>
+                  <th>期數</th>
+                  <th>生效日</th>
+                  <th>到期日</th>
+                  <th>發票號碼</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><span class="cell-strong">Uber Eats 外送平台訂閱費</span></td>
+                  <td class="num">$1,500/月</td>
+                  <td>月繳第 11/12 期</td>
+                  <td>2025-05-01</td>
+                  <td>2026-04-30</td>
+                  <td><a class="invoice-link">EF12312300</a></td>
+                </tr>
+                <tr>
+                  <td><span class="cell-strong">foodpanda 外送平台訂閱費</span></td>
+                  <td class="num">$1,500/月</td>
+                  <td>月繳第 11/12 期</td>
+                  <td>2025-05-01</td>
+                  <td>2026-04-30</td>
+                  <td><a class="invoice-link">EF12312400</a></td>
+                </tr>
+              </tbody>
+            </table></div>
+            </div><!-- /table-section 年租 -->
+
+            <div class="empty-state" data-empty hidden>
+              <svg viewBox="0 0 160 160" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="M7 25.0566C7 20.0548 11.0548 16 16.0566 16H117.943C122.945 16 127 20.0548 127 25.0566V126.943C127 131.945 122.945 136 117.943 136H16.0566C11.0548 136 7 131.945 7 126.943V25.0566Z" fill="white"/><path d="M7 25.0566C7 20.0548 11.0548 16 16.0566 16H117.943C122.945 16 127 20.0548 127 25.0566V40H7V25.0566Z" fill="#BCE2DC"/><path d="M23.8242 28.0001C23.8242 30.2092 22.0334 32.0001 19.8242 32.0001C17.6151 32.0001 15.8242 30.2092 15.8242 28.0001C15.8242 25.7909 17.6151 24.0001 19.8242 24.0001C22.0334 24.0001 23.8242 25.7909 23.8242 28.0001Z" fill="white"/><path d="M35 28C35 30.2091 33.2091 32 31 32C28.7909 32 27 30.2091 27 28C27 25.7909 28.7909 24 31 24C33.2091 24 35 25.7909 35 28Z" fill="white"/><path d="M47 28C47 30.2091 45.2091 32 43 32C40.7909 32 39 30.2091 39 28C39 25.7909 40.7909 24 43 24C45.2091 24 47 25.7909 47 28Z" fill="white"/><circle cx="116.5" cy="108.5" r="27.5" fill="white"/><path d="M137.57 125.431C136.398 124.259 134.499 124.259 133.327 125.431C132.156 126.602 132.156 128.502 133.327 129.673L135.448 127.552L137.57 125.431ZM150.535 146.881C151.706 148.052 153.606 148.052 154.777 146.881C155.949 145.709 155.949 143.81 154.777 142.638L152.656 144.759L150.535 146.881ZM127.839 99.6309C129.01 98.4593 129.01 96.5598 127.839 95.3883C126.667 94.2167 124.768 94.2167 123.596 95.3883L125.717 97.5096L127.839 99.6309ZM103.596 115.388C102.424 116.56 102.424 118.459 103.596 119.631C104.768 120.802 106.667 120.802 107.839 119.631L105.717 117.51L103.596 115.388ZM107.839 95.3883C106.667 94.2167 104.768 94.2167 103.596 95.3883C102.424 96.5598 102.424 98.4593 103.596 99.6309L105.717 97.5096L107.839 95.3883ZM123.596 119.631C124.768 120.802 126.667 120.802 127.839 119.631C129.01 118.459 129.01 116.56 127.839 115.388L125.717 117.51L123.596 119.631ZM135.448 127.552L133.327 129.673L150.535 146.881L152.656 144.759L154.777 142.638L137.57 125.431L135.448 127.552ZM115.51 135.208V138.208C132.078 138.208 145.51 124.776 145.51 108.208H142.51H139.51C139.51 121.462 128.765 132.208 115.51 132.208V135.208ZM142.51 108.208H145.51C145.51 91.6391 132.078 78.2076 115.51 78.2076V81.2076V84.2076C128.765 84.2076 139.51 94.9528 139.51 108.208H142.51ZM115.51 81.2076V78.2076C98.9412 78.2076 85.5098 91.6391 85.5098 108.208H88.5098H91.5098C91.5098 94.9528 102.255 84.2076 115.51 84.2076V81.2076ZM88.5098 108.208H85.5098C85.5098 124.776 98.9412 138.208 115.51 138.208V135.208V132.208C102.255 132.208 91.5098 121.462 91.5098 108.208H88.5098ZM125.717 97.5096L123.596 95.3883L113.596 105.388L115.717 107.51L117.839 109.631L127.839 99.6309L125.717 97.5096ZM115.717 107.51L113.596 105.388L103.596 115.388L105.717 117.51L107.839 119.631L117.839 109.631L115.717 107.51ZM105.717 97.5096L103.596 99.6309L113.596 109.631L115.717 107.51L117.839 105.388L107.839 95.3883L105.717 97.5096ZM115.717 107.51L113.596 109.631L123.596 119.631L125.717 117.51L127.839 115.388L117.839 105.388L115.717 107.51Z" fill="#BCE2DC"/></svg>
+              <div class="empty-text">查無結果</div>
+            </div>
+            <div class="empty-state" data-empty-nocontract hidden>
+              <svg viewBox="0 0 160 160" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="M34.9559 53.6984C35.566 50.9532 38.0008 49 40.813 49H121.187C123.999 49 126.434 50.9532 127.044 53.6984L134.952 89.2862C135.564 92.0384 134.177 94.8452 131.619 96.0311L83.5238 118.33C81.9231 119.072 80.0769 119.072 78.4762 118.33L30.3809 96.0311C27.823 94.8452 26.4359 92.0384 27.0475 89.2862L34.9559 53.6984Z" fill="white"/><path d="M136 127C136 130.314 133.314 133 130 133H32C28.6863 133 26 130.314 26 127V95C26 91.6863 28.6863 89 32 89H60C63.3137 89 65.8841 91.8061 67.263 94.8193C69.472 99.6464 74.3444 103 80 103C85.6556 103 90.528 99.6464 92.737 94.8193C94.1159 91.8061 96.6863 89 100 89H130C133.314 89 136 91.6863 136 95V127Z" fill="#BCE2DC"/><path d="M80 17L80 33" stroke="#BCE2DC" stroke-width="4" stroke-linecap="round"/><path d="M55 21L60 33" stroke="#BCE2DC" stroke-width="4" stroke-linecap="round"/><path d="M105 21L100 33" stroke="#BCE2DC" stroke-width="4" stroke-linecap="round"/></svg>
+              <div class="empty-text">尚無合約內容</div>
+            </div>
+          </div><!-- /panel:sw -->
+
+          <!-- Panel: Past contracts -->
+          <div class="tab-panel" data-panel="past" role="tabpanel">
+            <p class="panel-hint">包含過往舊合約、一次性購買合約、軟體一次性費用。</p>
+            <div class="search-input">
+              <svg class="s-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+              <input type="text" placeholder="搜尋" />
+            </div>
+
+            <div class="table-scroll"><table class="data-table name-first">
+              <thead>
+                <tr>
+                  <th>項目名稱</th>
+                  <th>日期</th>
+                  <th class="num">費用</th>
+                  <th>發票號碼</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><span class="cell-strong">外送平台首次串接服務費</span></td>
+                  <td>2025-05-01</td>
+                  <td class="num">$3,000</td>
+                  <td><a class="invoice-link">EF00011122</a></td>
+                </tr>
+                <tr>
+                  <td><span class="cell-strong">電子發票加值平台首次申辦費用</span></td>
+                  <td>2025-01-01</td>
+                  <td class="num">$1,800</td>
+                  <td><a class="invoice-link">AB98765432</a></td>
+                </tr>
+                <tr>
+                  <td><span class="cell-strong">出單機 EPSON TM-U220 × 2</span></td>
+                  <td>2024-08-12</td>
+                  <td class="num">$8,400</td>
+                  <td><a class="invoice-link">AB12345678</a></td>
+                </tr>
+                <tr>
+                  <td><span class="cell-strong">4G 路由器</span></td>
+                  <td>2024-08-12</td>
+                  <td class="num">$2,200</td>
+                  <td><a class="invoice-link">AB28475902</a></td>
+                </tr>
+                <tr>
+                  <td><span class="cell-strong">Kiosk 硬體延長保固費</span></td>
+                  <td>2024-08-12</td>
+                  <td class="num">$5,000</td>
+                  <td><a class="invoice-link">AB55667788</a></td>
+                </tr>
+                <tr>
+                  <td><span class="cell-strong">Kiosk MP × 3</span></td>
+                  <td>2023-01-01</td>
+                  <td class="num">$126,000</td>
+                  <td><a class="invoice-link">AB00112233</a></td>
+                </tr>
+              </tbody>
+            </table></div>
+
+            <div class="pagination">
+              <div class="page-size">
+                <span>每頁行數</span>
+                <select>
+                  <option>10</option>
+                  <option>25</option>
+                  <option>50</option>
+                </select>
+              </div>
+              <span>1-6 of 6</span>
+              <div class="page-nav">
+                <button aria-label="上一頁">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+                </button>
+                <button aria-label="下一頁">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+                </button>
+              </div>
+            </div>
+
+            <div class="empty-state" data-empty hidden>
+              <svg viewBox="0 0 160 160" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="M7 25.0566C7 20.0548 11.0548 16 16.0566 16H117.943C122.945 16 127 20.0548 127 25.0566V126.943C127 131.945 122.945 136 117.943 136H16.0566C11.0548 136 7 131.945 7 126.943V25.0566Z" fill="white"/><path d="M7 25.0566C7 20.0548 11.0548 16 16.0566 16H117.943C122.945 16 127 20.0548 127 25.0566V40H7V25.0566Z" fill="#BCE2DC"/><path d="M23.8242 28.0001C23.8242 30.2092 22.0334 32.0001 19.8242 32.0001C17.6151 32.0001 15.8242 30.2092 15.8242 28.0001C15.8242 25.7909 17.6151 24.0001 19.8242 24.0001C22.0334 24.0001 23.8242 25.7909 23.8242 28.0001Z" fill="white"/><path d="M35 28C35 30.2091 33.2091 32 31 32C28.7909 32 27 30.2091 27 28C27 25.7909 28.7909 24 31 24C33.2091 24 35 25.7909 35 28Z" fill="white"/><path d="M47 28C47 30.2091 45.2091 32 43 32C40.7909 32 39 30.2091 39 28C39 25.7909 40.7909 24 43 24C45.2091 24 47 25.7909 47 28Z" fill="white"/><circle cx="116.5" cy="108.5" r="27.5" fill="white"/><path d="M137.57 125.431C136.398 124.259 134.499 124.259 133.327 125.431C132.156 126.602 132.156 128.502 133.327 129.673L135.448 127.552L137.57 125.431ZM150.535 146.881C151.706 148.052 153.606 148.052 154.777 146.881C155.949 145.709 155.949 143.81 154.777 142.638L152.656 144.759L150.535 146.881ZM127.839 99.6309C129.01 98.4593 129.01 96.5598 127.839 95.3883C126.667 94.2167 124.768 94.2167 123.596 95.3883L125.717 97.5096L127.839 99.6309ZM103.596 115.388C102.424 116.56 102.424 118.459 103.596 119.631C104.768 120.802 106.667 120.802 107.839 119.631L105.717 117.51L103.596 115.388ZM107.839 95.3883C106.667 94.2167 104.768 94.2167 103.596 95.3883C102.424 96.5598 102.424 98.4593 103.596 99.6309L105.717 97.5096L107.839 95.3883ZM123.596 119.631C124.768 120.802 126.667 120.802 127.839 119.631C129.01 118.459 129.01 116.56 127.839 115.388L125.717 117.51L123.596 119.631ZM135.448 127.552L133.327 129.673L150.535 146.881L152.656 144.759L154.777 142.638L137.57 125.431L135.448 127.552ZM115.51 135.208V138.208C132.078 138.208 145.51 124.776 145.51 108.208H142.51H139.51C139.51 121.462 128.765 132.208 115.51 132.208V135.208ZM142.51 108.208H145.51C145.51 91.6391 132.078 78.2076 115.51 78.2076V81.2076V84.2076C128.765 84.2076 139.51 94.9528 139.51 108.208H142.51ZM115.51 81.2076V78.2076C98.9412 78.2076 85.5098 91.6391 85.5098 108.208H88.5098H91.5098C91.5098 94.9528 102.255 84.2076 115.51 84.2076V81.2076ZM88.5098 108.208H85.5098C85.5098 124.776 98.9412 138.208 115.51 138.208V135.208V132.208C102.255 132.208 91.5098 121.462 91.5098 108.208H88.5098ZM125.717 97.5096L123.596 95.3883L113.596 105.388L115.717 107.51L117.839 109.631L127.839 99.6309L125.717 97.5096ZM115.717 107.51L113.596 105.388L103.596 115.388L105.717 117.51L107.839 119.631L117.839 109.631L115.717 107.51ZM105.717 97.5096L103.596 99.6309L113.596 109.631L115.717 107.51L117.839 105.388L107.839 95.3883L105.717 97.5096ZM115.717 107.51L113.596 109.631L123.596 119.631L125.717 117.51L127.839 115.388L117.839 105.388L115.717 107.51Z" fill="#BCE2DC"/></svg>
+              <div class="empty-text">查無結果</div>
+            </div>
+            <div class="empty-state" data-empty-nocontract hidden>
+              <svg viewBox="0 0 160 160" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="M34.9559 53.6984C35.566 50.9532 38.0008 49 40.813 49H121.187C123.999 49 126.434 50.9532 127.044 53.6984L134.952 89.2862C135.564 92.0384 134.177 94.8452 131.619 96.0311L83.5238 118.33C81.9231 119.072 80.0769 119.072 78.4762 118.33L30.3809 96.0311C27.823 94.8452 26.4359 92.0384 27.0475 89.2862L34.9559 53.6984Z" fill="white"/><path d="M136 127C136 130.314 133.314 133 130 133H32C28.6863 133 26 130.314 26 127V95C26 91.6863 28.6863 89 32 89H60C63.3137 89 65.8841 91.8061 67.263 94.8193C69.472 99.6464 74.3444 103 80 103C85.6556 103 90.528 99.6464 92.737 94.8193C94.1159 91.8061 96.6863 89 100 89H130C133.314 89 136 91.6863 136 95V127Z" fill="#BCE2DC"/><path d="M80 17L80 33" stroke="#BCE2DC" stroke-width="4" stroke-linecap="round"/><path d="M55 21L60 33" stroke="#BCE2DC" stroke-width="4" stroke-linecap="round"/><path d="M105 21L100 33" stroke="#BCE2DC" stroke-width="4" stroke-linecap="round"/></svg>
+              <div class="empty-text">尚無合約內容</div>
+            </div>
+          </div><!-- /panel:past -->
+          </div><!-- /tab-panels -->
+        </div><!-- /contract-tabs -->
+      </div>
+
+      <footer class="footer">
+        <span>隱私權政策</span>
+        <span>©</span>
+        <span>電小二智慧點餐系統</span>
+      </footer>
+    </div>
+  </div>
+
+  <div class="toast" id="toast"></div>
+
+  <script>
+    // ============ Contract state variants per store ============
+    // Each store shows a different combination of contract states for demo
+    const storeData = {
+      east: {
+        status:   { text: '生效中',           tone: 'mint'  },
+        duration: { text: '2026-01-01 ~<br>2026-12-31'      },
+        hardware: { text: '2026-12-31',       chip: false   },
+        software: { text: '2026-07-31',       chip: true    },
+      },
+      south: {
+        status:   { text: '即將到期',         tone: 'warn'  },
+        duration: { text: '2026-01-01 ~<br>2026-12-31'      },
+        hardware: { text: '2026-12-31',       chip: true    },
+        software: { text: '2026-01-05',       chip: true    },
+      },
+      west: {
+        status:   { text: '已到期',           tone: 'error' },
+        duration: { text: '2024-01-01 ~<br>2024-12-31'      },
+        hardware: { text: '買斷，無租期',      chip: false, tone: 'muted' },
+        software: { text: '—',                chip: false, dash: true },
+      },
+      north: {
+        status:   { text: '生效中',           tone: 'mint'  },
+        duration: { text: '2025-01-01 ~<br>2025-12-31'      },
+        hardware: { text: '買斷，無租期',      chip: false, tone: 'muted' },
+        software: { text: '2026-07-31',       chip: true    },
+      },
+      neihu: {
+        status:   { text: '生效中',           tone: 'mint'  },
+        duration: { text: '2026-01-01 ~<br>2026-12-31'      },
+        hardware: { text: '2026-12-31',       chip: false   },
+        software: { text: '2026-07-31',       chip: true    },
+        noContract: true,
+      },
+    };
+
+    function renderSummaryCard(storeKey) {
+      const data = storeData[storeKey] || storeData.east;
+      document.querySelectorAll('.summary-item').forEach((item) => {
+        const key = item.dataset.key;
+        const val = item.querySelector('[data-value]');
+        const chip = item.querySelector('[data-chip]');
+        const cfg = data[key];
+        if (!cfg) return;
+
+        val.innerHTML = cfg.text;
+        val.classList.remove('mint', 'warn', 'error', 'muted', 'dash');
+        if (cfg.tone) val.classList.add(cfg.tone);
+        if (cfg.dash) val.classList.add('dash');
+
+        if (chip) chip.hidden = !cfg.chip;
+      });
+
+      // Toggle "尚無合約內容" empty state per panel + hide table sections + search bar
+      const noContract = !!data.noContract;
+      document.querySelectorAll('.tab-panel').forEach((panel) => {
+        panel.querySelectorAll('.table-section, .table-scroll, .pagination, .search-input').forEach((el) => {
+          if (el.closest('.table-section') && !el.classList.contains('table-section')) return;
+          el.style.display = noContract ? 'none' : '';
+        });
+        const noContractEmpty = panel.querySelector('[data-empty-nocontract]');
+        if (noContractEmpty) noContractEmpty.hidden = !noContract;
+        // Also clear search input value + hide 查無結果 empty state
+        const searchInput = panel.querySelector('.search-input input');
+        if (searchInput) searchInput.value = '';
+        const searchEmpty = panel.querySelector('[data-empty]');
+        if (searchEmpty) searchEmpty.hidden = true;
+      });
+    }
+
+    // Store selector toast + card update
+    const storeSel = document.getElementById('storeSelector');
+    const toast = document.getElementById('toast');
+    let toastTimer;
+    renderSummaryCard(storeSel.value);
+    storeSel.addEventListener('change', (e) => {
+      renderSummaryCard(e.target.value);
+      const label = e.target.selectedOptions[0].textContent.trim();
+      toast.textContent = '已切換至：' + label;
+      toast.classList.add('show');
+      clearTimeout(toastTimer);
+      toastTimer = setTimeout(() => toast.classList.remove('show'), 2000);
+    });
+
+    // Contract tabs
+    const tabContainer = document.getElementById('contractTabs');
+    tabContainer.querySelectorAll('.tab-btn').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        const target = btn.dataset.panel;
+        tabContainer.querySelectorAll('.tab-btn').forEach((b) => b.classList.toggle('active', b === btn));
+        tabContainer.querySelectorAll('.tab-panel').forEach((p) => p.classList.toggle('active', p.dataset.panel === target));
+      });
+    });
+
+    // Sidebar expandable items — visual toggle only
+    document.querySelectorAll('.side-menu-item[data-toggle]').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        btn.classList.toggle('expanded');
+      });
+    });
+
+    // Search filtering — filter table rows within the same tab panel
+    document.querySelectorAll('.tab-panel .search-input input').forEach((input) => {
+      input.addEventListener('input', (e) => {
+        const query = e.target.value.trim().toLowerCase();
+        const panel = input.closest('.tab-panel');
+        let totalVisible = 0;
+        panel.querySelectorAll('.table-section, .table-scroll').forEach((container) => {
+          if (container.closest('.table-section') && !container.classList.contains('table-section')) return;
+          const rows = container.querySelectorAll('tbody tr');
+          let visibleCount = 0;
+          rows.forEach((row) => {
+            const match = !query || row.textContent.toLowerCase().includes(query);
+            row.style.display = match ? '' : 'none';
+            if (match) visibleCount++;
+          });
+          totalVisible += visibleCount;
+          if (container.classList.contains('table-section')) {
+            container.style.display = (visibleCount === 0 && query) ? 'none' : '';
+          }
+        });
+        // Toggle empty-state + pagination
+        const empty = panel.querySelector('[data-empty]');
+        if (empty) empty.hidden = !(query && totalVisible === 0);
+        const pagination = panel.querySelector('.pagination');
+        if (pagination) pagination.style.display = (query && totalVisible === 0) ? 'none' : '';
+        // For past panel: hide the plain table-scroll when no results too
+        const plainScroll = panel.querySelector(':scope > .table-scroll');
+        if (plainScroll) plainScroll.style.display = (query && totalVisible === 0) ? 'none' : '';
+      });
+    });
+  </script>
+</body>
+</html>
