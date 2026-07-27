@@ -1008,56 +1008,19 @@
         <!-- ========= Contract detail tabs ========= -->
         <div class="contract-tabs" id="contractTabs">
           <div class="tabs-bar" role="tablist">
-            <button class="tab-btn active" data-panel="hw" role="tab">硬體合約</button>
-            <button class="tab-btn" data-panel="sw" role="tab">軟體合約</button>
-            <button class="tab-btn" data-panel="past" role="tab">過往合約</button>
+            <button class="tab-btn active" data-panel="hw" role="tab">硬體</button>
+            <button class="tab-btn" data-panel="sw" role="tab">軟體</button>
+            <button class="tab-btn" data-panel="past" role="tab">其他</button>
           </div>
 
           <div class="tab-panels">
           <!-- Panel: Hardware -->
           <div class="tab-panel active" data-panel="hw" role="tabpanel">
-            <p class="panel-hint">當前硬體合約，僅包含 Kiosk、POS 機台。</p>
+            <p class="panel-hint">當前硬體合約，包含 Kiosk、POS、一次性購買硬體/耗材等。</p>
             <div class="search-input">
               <svg class="s-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
               <input type="text" placeholder="搜尋" />
             </div>
-
-            <div class="table-section">
-            <h3 class="sub-heading">買斷硬體</h3>
-            <div class="table-scroll"><table class="data-table">
-              <thead>
-                <tr>
-                  <th>產品類別</th>
-                  <th>機型</th>
-                  <th class="num">費用</th>
-                  <th>購買日</th>
-                  <th>保固到期日</th>
-                  <th>硬體狀態</th>
-                  <th>發票號碼</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr>
-                  <td><span class="cell-strong">Kiosk</span></td>
-                  <td>MF</td>
-                  <td class="num">$68,000</td>
-                  <td>2024-08-12</td>
-                  <td>2026-08-11</td>
-                  <td>使用中</td>
-                  <td><a class="invoice-link">AB12345678</a></td>
-                </tr>
-                <tr>
-                  <td><span class="cell-strong">POS</span></td>
-                  <td>Advantech</td>
-                  <td class="num">$42,000</td>
-                  <td>2024-11-05</td>
-                  <td>2026-11-04</td>
-                  <td>已歸還</td>
-                  <td><a class="invoice-link">AB99887766</a></td>
-                </tr>
-              </tbody>
-            </table></div>
-            </div><!-- /table-section 買斷 -->
 
             <div class="table-section">
             <h3 class="sub-heading">租賃硬體</h3>
@@ -1105,6 +1068,52 @@
             </table></div>
             </div><!-- /table-section 租賃 -->
 
+            <div class="table-section">
+            <h3 class="sub-heading">買斷硬體</h3>
+            <div class="table-scroll"><table class="data-table">
+              <thead>
+                <tr>
+                  <th>產品類別</th>
+                  <th>機型</th>
+                  <th class="num">費用</th>
+                  <th>購買日</th>
+                  <th>保固到期日</th>
+                  <th>硬體狀態</th>
+                  <th>發票號碼</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><span class="cell-strong">Kiosk</span></td>
+                  <td>MF</td>
+                  <td class="num">$68,000</td>
+                  <td>2025-08-12</td>
+                  <td>2026-08-11</td>
+                  <td>使用中</td>
+                  <td><a class="invoice-link">AB12345678</a></td>
+                </tr>
+                <tr>
+                  <td><span class="cell-strong">出單機</span></td>
+                  <td>EPSON TM-U220</td>
+                  <td class="num">$4,800</td>
+                  <td>2025-03-26</td>
+                  <td>2025-03-25</td>
+                  <td>使用中</td>
+                  <td><a class="invoice-link">AB12345678</a></td>
+                </tr>
+                <tr>
+                  <td><span class="cell-strong">POS</span></td>
+                  <td>Advantech</td>
+                  <td class="num">$42,000</td>
+                  <td>2024-11-05</td>
+                  <td>2026-11-04</td>
+                  <td>已歸還</td>
+                  <td><a class="invoice-link">AB99887766</a></td>
+                </tr>
+              </tbody>
+            </table></div>
+            </div><!-- /table-section 買斷 -->
+
             <div class="empty-state" data-empty hidden>
               <svg viewBox="0 0 160 160" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="M7 25.0566C7 20.0548 11.0548 16 16.0566 16H117.943C122.945 16 127 20.0548 127 25.0566V126.943C127 131.945 122.945 136 117.943 136H16.0566C11.0548 136 7 131.945 7 126.943V25.0566Z" fill="white"/><path d="M7 25.0566C7 20.0548 11.0548 16 16.0566 16H117.943C122.945 16 127 20.0548 127 25.0566V40H7V25.0566Z" fill="#BCE2DC"/><path d="M23.8242 28.0001C23.8242 30.2092 22.0334 32.0001 19.8242 32.0001C17.6151 32.0001 15.8242 30.2092 15.8242 28.0001C15.8242 25.7909 17.6151 24.0001 19.8242 24.0001C22.0334 24.0001 23.8242 25.7909 23.8242 28.0001Z" fill="white"/><path d="M35 28C35 30.2091 33.2091 32 31 32C28.7909 32 27 30.2091 27 28C27 25.7909 28.7909 24 31 24C33.2091 24 35 25.7909 35 28Z" fill="white"/><path d="M47 28C47 30.2091 45.2091 32 43 32C40.7909 32 39 30.2091 39 28C39 25.7909 40.7909 24 43 24C45.2091 24 47 25.7909 47 28Z" fill="white"/><circle cx="116.5" cy="108.5" r="27.5" fill="white"/><path d="M137.57 125.431C136.398 124.259 134.499 124.259 133.327 125.431C132.156 126.602 132.156 128.502 133.327 129.673L135.448 127.552L137.57 125.431ZM150.535 146.881C151.706 148.052 153.606 148.052 154.777 146.881C155.949 145.709 155.949 143.81 154.777 142.638L152.656 144.759L150.535 146.881ZM127.839 99.6309C129.01 98.4593 129.01 96.5598 127.839 95.3883C126.667 94.2167 124.768 94.2167 123.596 95.3883L125.717 97.5096L127.839 99.6309ZM103.596 115.388C102.424 116.56 102.424 118.459 103.596 119.631C104.768 120.802 106.667 120.802 107.839 119.631L105.717 117.51L103.596 115.388ZM107.839 95.3883C106.667 94.2167 104.768 94.2167 103.596 95.3883C102.424 96.5598 102.424 98.4593 103.596 99.6309L105.717 97.5096L107.839 95.3883ZM123.596 119.631C124.768 120.802 126.667 120.802 127.839 119.631C129.01 118.459 129.01 116.56 127.839 115.388L125.717 117.51L123.596 119.631ZM135.448 127.552L133.327 129.673L150.535 146.881L152.656 144.759L154.777 142.638L137.57 125.431L135.448 127.552ZM115.51 135.208V138.208C132.078 138.208 145.51 124.776 145.51 108.208H142.51H139.51C139.51 121.462 128.765 132.208 115.51 132.208V135.208ZM142.51 108.208H145.51C145.51 91.6391 132.078 78.2076 115.51 78.2076V81.2076V84.2076C128.765 84.2076 139.51 94.9528 139.51 108.208H142.51ZM115.51 81.2076V78.2076C98.9412 78.2076 85.5098 91.6391 85.5098 108.208H88.5098H91.5098C91.5098 94.9528 102.255 84.2076 115.51 84.2076V81.2076ZM88.5098 108.208H85.5098C85.5098 124.776 98.9412 138.208 115.51 138.208V135.208V132.208C102.255 132.208 91.5098 121.462 91.5098 108.208H88.5098ZM125.717 97.5096L123.596 95.3883L113.596 105.388L115.717 107.51L117.839 109.631L127.839 99.6309L125.717 97.5096ZM115.717 107.51L113.596 105.388L103.596 115.388L105.717 117.51L107.839 119.631L117.839 109.631L115.717 107.51ZM105.717 97.5096L103.596 99.6309L113.596 109.631L115.717 107.51L117.839 105.388L107.839 95.3883L105.717 97.5096ZM115.717 107.51L113.596 109.631L123.596 119.631L125.717 117.51L127.839 115.388L117.839 105.388L115.717 107.51Z" fill="#BCE2DC"/></svg>
               <div class="empty-text">查無結果</div>
@@ -1130,6 +1139,7 @@
                 <tr>
                   <th>項目名稱</th>
                   <th class="num">費用</th>
+                  <th>期數</th>
                   <th>生效日</th>
                   <th>到期日</th>
                   <th>發票號碼</th>
@@ -1139,6 +1149,7 @@
                 <tr>
                   <td><span class="cell-strong">Kiosk 點餐系統訂閱費</span></td>
                   <td class="num">$12,000/年</td>
+                  <td>第 11/12 期</td>
                   <td>2025-05-01</td>
                   <td>2026-04-30</td>
                   <td><a class="invoice-link">AB12345678</a></td>
@@ -1146,6 +1157,7 @@
                 <tr>
                   <td><span class="cell-strong">KDS 廚房顯示系統訂閱費</span></td>
                   <td class="num">$6,000/年</td>
+                  <td>第 11/12 期</td>
                   <td>2025-05-01</td>
                   <td>2026-04-30</td>
                   <td><a class="invoice-link">AB3234922</a></td>
@@ -1153,6 +1165,7 @@
                 <tr>
                   <td><span class="cell-strong">電子發票加值平台訂閱費</span></td>
                   <td class="num">$3,600/年</td>
+                  <td>第 11/12 期</td>
                   <td>2025-05-01</td>
                   <td>2026-04-30</td>
                   <td><a class="invoice-link">AB12354294</a></td>
@@ -1168,7 +1181,6 @@
                 <tr>
                   <th>項目名稱</th>
                   <th class="num">費用</th>
-                  <th>期數</th>
                   <th>生效日</th>
                   <th>到期日</th>
                   <th>發票號碼</th>
@@ -1178,7 +1190,6 @@
                 <tr>
                   <td><span class="cell-strong">Uber Eats 外送平台訂閱費</span></td>
                   <td class="num">$1,500/月</td>
-                  <td>月繳第 11/12 期</td>
                   <td>2025-05-01</td>
                   <td>2026-04-30</td>
                   <td><a class="invoice-link">EF12312300</a></td>
@@ -1186,7 +1197,6 @@
                 <tr>
                   <td><span class="cell-strong">foodpanda 外送平台訂閱費</span></td>
                   <td class="num">$1,500/月</td>
-                  <td>月繳第 11/12 期</td>
                   <td>2025-05-01</td>
                   <td>2026-04-30</td>
                   <td><a class="invoice-link">EF12312400</a></td>
@@ -1207,7 +1217,7 @@
 
           <!-- Panel: Past contracts -->
           <div class="tab-panel" data-panel="past" role="tabpanel">
-            <p class="panel-hint">包含過往舊合約、一次性購買合約、軟體一次性費用。</p>
+            <p class="panel-hint">包含過往舊合約與軟體一次性費用。</p>
             <div class="search-input">
               <svg class="s-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
               <input type="text" placeholder="搜尋" />
@@ -1235,30 +1245,6 @@
                   <td class="num">$1,800</td>
                   <td><a class="invoice-link">AB98765432</a></td>
                 </tr>
-                <tr>
-                  <td><span class="cell-strong">出單機 EPSON TM-U220 × 2</span></td>
-                  <td>2024-08-12</td>
-                  <td class="num">$8,400</td>
-                  <td><a class="invoice-link">AB12345678</a></td>
-                </tr>
-                <tr>
-                  <td><span class="cell-strong">4G 路由器</span></td>
-                  <td>2024-08-12</td>
-                  <td class="num">$2,200</td>
-                  <td><a class="invoice-link">AB28475902</a></td>
-                </tr>
-                <tr>
-                  <td><span class="cell-strong">Kiosk 硬體延長保固費</span></td>
-                  <td>2024-08-12</td>
-                  <td class="num">$5,000</td>
-                  <td><a class="invoice-link">AB55667788</a></td>
-                </tr>
-                <tr>
-                  <td><span class="cell-strong">Kiosk MP × 3</span></td>
-                  <td>2023-01-01</td>
-                  <td class="num">$126,000</td>
-                  <td><a class="invoice-link">AB00112233</a></td>
-                </tr>
               </tbody>
             </table></div>
 
@@ -1271,7 +1257,7 @@
                   <option>50</option>
                 </select>
               </div>
-              <span>1-6 of 6</span>
+              <span>1-2 of 2</span>
               <div class="page-nav">
                 <button aria-label="上一頁">
                   <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
